@@ -1,0 +1,7 @@
+Customer_ID,Password,Name,Age,Tenure,Current_Plan
+12345,hashed_pass_1,John Doe,28,2,Basic
+67890,hashed_pass_2,Jane Smith,34,5,Premium
+11223,hashed_pass_3,Mark Lee,45,10,Standard
+44556,hashed_pass_4,Emily Ray,60,20,Senior
+4vv23cs244,86af62813b0be1d3eb99e542d0d0c588f2b4a1fe4229a55d4325c99a0f66f8c4,vinyas,18,3,Basic
+4vv23cs214,c01663763048b4244c523f2767f852f426ea6bb150090b26cc9c15a705a50be6,suhas,18,3,Premium
