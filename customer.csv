@@ -1,7 +1,8 @@
-Customer_ID,Password,Name,Age,Tenure,Current_Plan
-12345,hashed_pass_1,John Doe,28,2,Basic
-67890,hashed_pass_2,Jane Smith,34,5,Premium
-11223,hashed_pass_3,Mark Lee,45,10,Standard
-44556,hashed_pass_4,Emily Ray,60,20,Senior
-4vv23cs244,86af62813b0be1d3eb99e542d0d0c588f2b4a1fe4229a55d4325c99a0f66f8c4,vinyas,18,3,Basic
-4vv23cs214,c01663763048b4244c523f2767f852f426ea6bb150090b26cc9c15a705a50be6,suhas,18,3,Premium
+Customer_ID,Name,Age,Tenure,Current_Plan,Password,Points,Email,Phone Number,Last Login,Account Created,Plan Expiry Date,Feedback,Subscription_Status
+C001,John Doe,28,3,Premium,password1,180,john@example.com,1234567890,2/1/2025 12:30,1/15/2022,1/15/2025,Excellent,Active
+C002,Jane Smith,34,5,Basic,password2,140,jane@example.com,987654321,2/14/2025 16:00,6/23/2020,6/23/2025,Good,Active
+C003,Emma Johnson,40,8,Standard,password3,170,emma@example.com,1122334455,2/12/2025 8:45,11/30/2017,11/30/2025,Satisfied,Active
+C004,Michael Brown,50,10,Premium,password4,250,mike@example.com,1223344556,2/10/2025 9:30,3/18/2014,3/18/2025,Excellent,Active
+C005,Lisa White,29,2,Standard,password5,110,lisa@example.com,1357924680,2/11/2025 14:00,8/10/2022,8/10/2025,Fair,Active
+4vv23cs244,VINYAS CS,18,0,Basic,8e7e79ff2fffff4458ad3a0e2144fb4ff25e2b99213374aa3cf56ed5c823e87b,100,,,2/16/2025 20:02,2/16/2025 20:02,2/16/2026,,Active
+c008,user1,18,12,Standard,0a041b9462caa4a31bac3567e0b6e6fd9100787db2ab433d96f6d178cabfce90,250,user1@gmail.com,9191919191,2/16/2025 20:16,2/16/2025 20:16,2/16/2026,,Active
