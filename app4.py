@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import numpy as np
 import pickle
+pip install matplotlib
 
 def generate_synthetic_data(n_samples=1000):
     np.random.seed(42)
