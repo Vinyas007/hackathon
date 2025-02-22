@@ -1,8 +1,6 @@
-Customer_ID,Name,Age,Tenure,Current_Plan,Password,Points,Email,Phone Number,Last Login,Account Created,Plan Expiry Date,Feedback,Subscription_Status
-C001,John Doe,28,3,Premium,password1,180,john@example.com,1234567890,2/1/2025 12:30,1/15/2022,1/15/2025,Excellent,Active
-C002,Jane Smith,34,5,Basic,password2,140,jane@example.com,987654321,2/14/2025 16:00,6/23/2020,6/23/2025,Good,Active
-C003,Emma Johnson,40,8,Standard,password3,170,emma@example.com,1122334455,2/12/2025 8:45,11/30/2017,11/30/2025,Satisfied,Active
-C004,Michael Brown,50,10,Premium,password4,250,mike@example.com,1223344556,2/10/2025 9:30,3/18/2014,3/18/2025,Excellent,Active
-C005,Lisa White,29,2,Standard,password5,110,lisa@example.com,1357924680,2/11/2025 14:00,8/10/2022,8/10/2025,Fair,Active
-4vv23cs244,VINYAS CS,18,0,Basic,8e7e79ff2fffff4458ad3a0e2144fb4ff25e2b99213374aa3cf56ed5c823e87b,100,,,2/16/2025 20:02,2/16/2025 20:02,2/16/2026,,Active
-c008,user1,18,12,Standard,0a041b9462caa4a31bac3567e0b6e6fd9100787db2ab433d96f6d178cabfce90,250,user1@gmail.com,9191919191,2/16/2025 20:16,2/16/2025 20:16,2/16/2026,,Active
+Customer_ID,Password,Name,Age,Tenure,Claims,Income,Current_Plan,Email,Phone Number,Last_Login,Account_Created,Plan_Expiry_Date,Feedback,Subscription_Status,Last Login,Account Created,Plan Expiry Date,Segment
+c001,8e7e79ff2fffff4458ad3a0e2144fb4ff25e2b99213374aa3cf56ed5c823e87b,vinyas,18.0,1.0,3.0,20000.0,,,,,2/18/2025 23:47,,,Active,,,,Needs Attention: Your claim history or financial status suggests a higher risk profile.
+C002,fcea791ab1622379f874c8c138c0654aa2821ec1422edc3806388b868432f28b,suhas,18.0,1.0,2.0,20000.0,,,,,2/18/2025 23:50,,,Active,,,,Needs Attention: Your claim history or financial status suggests a higher risk profile.
+C003,eb2a27e815933025f8a75e760a2efd847ebf3889d302e155efaa98bee577c379,vikas,18.0,2.0,2.0,37999.99,,,,,2/18/2025 23:56,,,Active,,,,"Moderate Risk: Your profile is balanced, but some claims or financial factors impact your category."
+C004,262cc47030b1803064844b94c1cb0054a247d1e550e26bb33f215149d8b2c72e,yashwanth,18.0,2.0,2.0,20000.0,Basic Plan,yashwanth@gmail.com,6301292821.0,,2/21/2025 22:42,,,Active,,,,"Moderate Risk: Your profile is balanced, but some claims or financial factors impact your category."
+c005,4130d038197e171b6f30226d8a922ed605c8210e15fad108abed9f895cc32842,yashith,18.0,1.0,1.0,70000.0,Standard Plan,yahsith@gmail.com,6565652323.0,,2/22/2025 11:26,,,Active,,,,Stable & Responsible: You have a strong financial profile and a low claim history.
