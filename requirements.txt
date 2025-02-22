@@ -5,3 +5,4 @@ keras
 scikit-learn
 pandas
 numpy
+tensorflow
