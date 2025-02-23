@@ -1,8 +1,8 @@
 streamlit
-matplotlib
-seaborn
-keras
-scikit-learn
 pandas
 numpy
+scikit-learn
+keras
 tensorflow
+matplotlib
+pickle-mixin
