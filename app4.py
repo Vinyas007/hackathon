@@ -3,152 +3,258 @@ import pandas as pd
 import streamlit as st
 import time
 import os
-import matplotlib.pyplot as plt
-import seaborn as sns
 from keras.models import load_model
 from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
 import numpy as np
 import pickle
+import streamlit.components.v1 as components
 
-
-def generate_synthetic_data(n_samples=1000):
-    np.random.seed(42)
-    customer_ids = [f'C{i:03d}' for i in range(n_samples)]
-    ages = np.random.randint(18, 70, size=n_samples)
-    incomes = np.random.randint(20000, 150000, size=n_samples)
-    tenures = np.random.randint(0, 30, size=n_samples)
-    claims = np.random.randint(0, 10, size=n_samples)
-    plans = np.random.choice(['Basic Plan', 'Standard Plan', 'Premium Plan'], size=n_samples)
-    emails = [f'customer{i}@example.com' for i in range(n_samples)]
-    phone_numbers = [f'{np.random.randint(6000000000, 9999999999)}' for _ in range(n_samples)]
-    
-    df = pd.DataFrame({
-        'Customer_ID': customer_ids,
-        'Age': ages,
-        'Income': incomes,
-        'Tenure': tenures,
-        'Claims': claims,
-        'Current_Plan': plans,
-        'Email': emails,
-        'Phone Number': phone_numbers
-    })
-    df.to_csv('customer.csv', index=False)
-    return df
-
-def train_kmeans(df, n_clusters=3):
-    features = ['Age', 'Income', 'Tenure', 'Claims']
-    scaler = StandardScaler()
-    df_scaled = scaler.fit_transform(df[features])
-    
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
-    df['Segment'] = kmeans.fit_predict(df_scaled)
-    
-    segment_mapping = {
-        0: "Stable & Responsible: You have a strong financial profile and a low claim history.",
-        1: "Moderate Risk: Your profile is balanced, but some claims or financial factors impact your category.",
-        2: "Needs Attention: Your claim history or financial status suggests a higher risk profile."
-    }
-    df['Segment'] = df['Segment'].map(segment_mapping)
-    
-    df.to_csv('customer.csv', index=False)
-    
-    with open('scaler.pkl', 'wb') as f:
-        pickle.dump(scaler, f)
-    with open('kmeans.pkl', 'wb') as f:
-        pickle.dump(kmeans, f)
-    
-    return df
-
-def visualize_clusters(df):
-    plt.figure(figsize=(10, 6))
-    sns.scatterplot(x=df['Age'], y=df['Income'], hue=df['Segment'], palette='coolwarm')
-    plt.title("Customer Clusters by Age and Income")
-    plt.xlabel("Age")
-    plt.ylabel("Income")
-    st.pyplot(plt)
-
+# Hash password function using hashlib (SHA-256)
 def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+    """Hashes a password using SHA-256."""
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()  # Hash the password
+    return hashed_password
 
+# Verify hashed password during login
 def verify_password(stored_hashed_password, entered_password):
-    return stored_hashed_password == hashlib.sha256(entered_password.encode()).hexdigest()
+    """Verify that the entered password matches the stored hashed password."""
+    hashed_entered_password = hashlib.sha256(entered_password.encode()).hexdigest()
+    return stored_hashed_password == hashed_entered_password
 
+# Load customer data from CSV
 def load_data():
+    """Load the customer data from CSV."""
     if not os.path.exists('customer.csv'):
-        generate_synthetic_data()
-    df = pd.read_csv('customer.csv')
-    df['Customer_ID'] = df['Customer_ID'].astype(str).str.strip()
+        st.error("Customer data file is missing!")
+        return pd.DataFrame()  # Return an empty DataFrame to avoid errors
+    df = pd.read_csv('customer.csv')  # Read from CSV file
+    df['Customer_ID'] = df['Customer_ID'].astype(str).str.strip()  # Ensure Customer_ID is treated as a string and stripped of spaces
     return df
 
+# Load pre-trained deep learning model for customer behavior prediction
 @st.cache_resource
 def load_behavior_model():
+    """Load the pre-trained AI model."""
     if not os.path.exists('customer_behavior_model.h5'):
         st.error("Model file is missing!")
         return None
-    return load_model('customer_behavior_model.h5')
+    model = load_model('customer_behavior_model.h5')  # Load pre-trained AI model
+    return model
 
-@st.cache_resource
-def load_scaler():
-    if os.path.exists('scaler.pkl'):
-        with open('scaler.pkl', 'rb') as f:
-            return pickle.load(f)
-    return None
+# Standardize data for model prediction using loaded scaler
+def scale_data(data, scaler):
+    return scaler.transform(data)
 
-@st.cache_resource
-def load_kmeans():
-    if os.path.exists('kmeans.pkl'):
-        with open('kmeans.pkl', 'rb') as f:
-            return pickle.load(f)
-    return None
 
-def recommend_policy(customer_data, model, scaler, kmeans):
-    customer_df = pd.DataFrame([customer_data])
-    features = ['Age', 'Income', 'Tenure', 'Claims']
-    customer_df = customer_df[features]  
-    
-    scaled_features = scaler.transform(customer_df)
-    segment = kmeans.predict(scaled_features)[0]
-    segment_recommendations = {0: "Basic Plan", 1: "Standard Plan", 2: "Premium Plan"}
-    return segment_recommendations.get(segment, "Standard Plan")
 
+
+# Authenticate user login
 def authenticate_user(customer_id, password, df):
-    customer_id = customer_id.strip()
-    user_row = df.loc[df['Customer_ID'] == customer_id]
-    if not user_row.empty:
-        stored_hashed_password = user_row['Password'].iloc[0]
-        return verify_password(stored_hashed_password, password)
-    return False
+    """Authenticate the user based on Customer ID and password."""
+    customer_id = customer_id.strip()  # Strip spaces from entered Customer ID
+    
+    # Check if customer ID exists in the DataFrame (stripping any spaces)
+    if customer_id in df['Customer_ID'].values:
+        stored_hashed_password = df[df['Customer_ID'] == customer_id]['Password'].values[0]
+        
+        # Verify the entered password by comparing with the stored hashed password
+        if verify_password(stored_hashed_password, password):
+            return True  # Login successful
+        else:
+            st.error("Incorrect password entered!")  # Debugging message
+    else:
+        st.error("Customer ID not found!")  # Debugging message
+    
+    return False  # Login failed
+
+# Load model & scaler
+model = load_model('customer_behavior_model.h5')
+with open('scaler.pkl', 'rb') as f:
+    scaler = pickle.load(f)
+
+import numpy as np
+import pandas as pd
+import pickle
+
+def recommend_policy(customer_data, model, scaler):
+    customer_df = pd.DataFrame([customer_data])
+
+    # One-hot encode as in training
+    customer_df = pd.get_dummies(customer_df, columns=['Current_Plan', 'Subscription_Status'])
+
+    # Ensure all required columns exist
+    required_features = scaler.feature_names_in_
+    for col in required_features:
+        if col not in customer_df.columns:
+            customer_df[col] = 0  # Add missing columns
+
+    # Reorder columns to match training data
+    customer_df = customer_df[required_features]
+
+    # Standardize the data
+    scaled_features = scaler.transform(customer_df)
+
+    # Predict the insurance plan
+    prediction = model.predict(scaled_features)[0]  # Get the first row's prediction
+
+    prediction = np.argmax(prediction)  # ✅ Get index of the highest probability
+
+    # Map prediction index to plan names
+    plan_mapping = {0: "Basic Plan", 1: "Premium Plan", 2: "Standard Plan"}
+    return plan_mapping.get(prediction, "Unknown Plan")  # Return mapped plan
+
+
+
+
+
 
 def main():
     st.title("Customer Insurance Management App")
+
+    # Load customer data and AI model
     df = load_data()
     model = load_behavior_model()
-    scaler = load_scaler()
-    kmeans = load_kmeans()
-    
-    if scaler is None or kmeans is None:
-        df = train_kmeans(df)
-        kmeans, scaler = load_kmeans(), load_scaler()
-    
+
+    # Load the scaler used during training using pickle
+    scaler = None
+    if os.path.exists('scaler.pkl'):
+        with open('scaler.pkl', 'rb') as f:
+            scaler = pickle.load(f)  # Load pre-fitted scaler
+            st.write("Scaler loaded successfully.")
+    else:
+        st.error("Scaler file is missing. Please ensure the model training includes saving the scaler.")
+
+    if scaler is None:
+        return  # Prevent further processing if scaler is not available
+
+    # Home Page
+    st.markdown(
+        """
+        <div class="home-container">
+            <h2 class="title">Welcome to the Insurance Portal</h2>
+            <p class="plan-description">Your insurance, our responsibility. Choose the best plan tailored to you!</p>
+            <button class="button" onclick="window.location.href='#login'">Get Started</button>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Display Insurance Plans with Sliding Cards
+    st.markdown(
+        """
+        <h2 class="title">Our Insurance Plans</h2>
+        <div class="slider-container">
+            <div class="slider-card">
+                <h3 class="card-header">Basic Plan</h3>
+                <p class="plan-description">Affordable coverage for young individuals and small families.</p>
+            </div>
+            <div class="slider-card">
+                <h3 class="card-header">Premium Plan</h3>
+                <p class="plan-description">Comprehensive plan for families with extensive coverage.</p>
+            </div>
+            <div class="slider-card">
+                <h3 class="card-header">Standard Plan</h3>
+                <p class="plan-description">Balanced coverage ideal for individuals seeking good benefits.</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Login or Sign Up page
     login = st.sidebar.selectbox("Select an option", ["Login", "Sign Up"])
-    
+
     if login == "Login":
         st.subheader("Login to Your Account")
         customer_id = st.text_input("Customer ID")
         password = st.text_input("Password", type='password')
-        
+
         if st.button("Login"):
             if authenticate_user(customer_id, password, df):
                 st.success(f"Logged in successfully as Customer ID: {customer_id}")
+
+                # Fetch customer details after login
                 customer_data = df[df['Customer_ID'] == customer_id].iloc[0]
+
                 st.subheader("Customer Profile")
                 st.write(f"Name: {customer_data['Name']}")
-                st.write(f"Segment: {customer_data['Segment']}")
-                st.write(f"Recommended Plan: {recommend_policy(customer_data, model, scaler, kmeans)}")
-                
-                st.subheader("Cluster Visualization")
-                visualize_clusters(df)
+                st.write(f"Age: {customer_data['Age']}")
+                st.write(f"Tenure: {customer_data['Tenure']} years")
+                st.write(f"Selected Plan: {customer_data['Current_Plan']}")  # ✅ Use the actual plan from the data
+                st.subheader("Chat with Our Virtual Insurance Assistant 🤖")
+                chatbot_html = """
+                <iframe 
+                src="https://www.chatbase.co/chatbot-iframe/nB1Du0wNzteKYTGiOUkJD" 
+                width="100%" 
+                height="700px"
+                style="border:none;">
+                </iframe>
+                """
+                st.components.v1.html(chatbot_html, height=700)
+
+
+
+                # AI-driven Recommendation
+                recommended_plan = recommend_policy(customer_data, model, scaler)
+                st.write(f"Recommended Insurance Plan: {recommended_plan}")
+
+                # Provide personalized feedback page
+                feedback = st.text_area("Provide your feedback here")
+                if st.button("Submit Feedback"):
+                    st.write("Feedback submitted successfully!")
+
+            else:
+                st.error("Invalid Customer ID or Password")
+
+    elif login == "Sign Up":
+        st.subheader("Sign Up to Create a New Account")
+        new_customer_id = st.text_input("Enter a new Customer ID")
+        new_password = st.text_input("Create a Password", type='password')
+        new_name = st.text_input("Enter your Full Name")
+        new_age = st.number_input("Enter your Age", min_value=18)
+        new_tenure = st.number_input("Enter your Tenure (in years)", min_value=0)
+        new_plan = st.selectbox("Select Your Insurance Plan", ["Basic Plan", "Standard Plan", "Premium Plan"])
+        new_income = st.number_input("Enter your Income")
+        new_claims = st.number_input("Enter your Claims History")
+        new_email = st.text_input("Enter Your Email")
+        new_no = st.number_input("Enter your mobile_no", min_value=10)
+        if new_email and ("@" not in new_email or "." not in new_email):
+            st.error("Please enter a valid email address.")
+    elif login == "Chatbot":
+        chatbot_page()
     
+    
+
+        if st.button("Sign Up"):
+            if new_customer_id and new_password and new_name:
+                # Hash the password before saving
+                hashed_password = hash_password(new_password)
+                
+                # Append the new user's data to the DataFrame
+                new_data = pd.DataFrame([{
+                    'Customer_ID': new_customer_id,
+                    'Password': hashed_password,  # Store the hashed password
+                    'Name': new_name,
+                    'Age': new_age,
+                    'Tenure': new_tenure,
+                    'Income': new_income,
+                    'Claims': new_claims,
+                    'Current_Plan': new_plan,  # Default value, can be updated later
+                    'Email': new_email,
+                    'Phone Number': new_no,
+                    'Last_Login': '',
+                    'Account_Created': time.strftime("%Y-%m-%d %H:%M:%S"),  # Timestamp when account is created
+                    'Plan_Expiry_Date': '',
+                    'Feedback': '',
+                    'Subscription_Status': 'Active'
+                }])
+                df = pd.concat([df, new_data], ignore_index=True)
+
+                # Save the updated DataFrame back to CSV
+                df.to_csv('customer.csv', index=False)
+
+                # Reload the data after saving to ensure the login works immediately
+                df = load_data()
+
+                st.success(f"Account created successfully for {new_name}!")
+                st.success(f"Selected Plan: {new_plan}")
+
+# Run the app
 if __name__ == "__main__":
     main()
